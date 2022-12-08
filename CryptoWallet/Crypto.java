@@ -17,7 +17,7 @@ public class Crypto {
 
     public Crypto(String symbol, double holding) throws InvalidCrypto {
         for(int i=0; i<cryptoInfo.length; i++) {
-            if(cryptoInfo[i].symbol == symbol) {
+            if(cryptoInfo[i].symbol.equals(symbol)) {
                 this.name = cryptoInfo[i].name;
                 this.totalValue = cryptoInfo[i].value * holding;
                 this.changePercentage = cryptoInfo[i].changePercentage;

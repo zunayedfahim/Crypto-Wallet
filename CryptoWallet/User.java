@@ -4,10 +4,12 @@ import java.math.BigInteger;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.Arrays;
+import java.util.UUID;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class User {
+    String userId;
     String fullName;
     String email;
     String username;
@@ -20,7 +22,7 @@ public class User {
     Transaction[] transactionHistory = {};
 
     public User(String fullName, String email, String username, String pass, String NID, String phoneNumber) throws Exception {
-        // TODO: add userId
+        this.userId = UUID.randomUUID().toString();
         this.fullName = fullName;
         this.pass = hashPassword(pass);
         
@@ -85,7 +87,7 @@ public class User {
         this.transactionHistory[this.transactionHistory.length - 1] = t;
     }
 
-    public void buyCrypto(Crypto c) {
+    public void buyCrypto(Crypto c) throws InterruptedException {
 
         // if the crypto is already in the holding
         for(int i=0; i<this.holdedCrypto.length; i++) {
@@ -94,6 +96,10 @@ public class User {
                 this.holdedCrypto[i].holding += c.holding;
                 Transaction t = new Transaction("IN", c.totalValue, c.symbol);
                 this.addTransaction(t);
+                System.out.println(c.symbol + " added to your holdings.");
+                System.out.println("Returning to Dashboard ...");
+                Thread.sleep(5000);
+                Main.clearScreen();
                 return;
             }
         }
@@ -103,6 +109,10 @@ public class User {
         this.holdedCrypto[this.holdedCrypto.length - 1] = c;
         Transaction t = new Transaction("IN", c.totalValue, c.symbol);
         this.addTransaction(t);
+        System.out.println(c.symbol + " added to your holdings.");
+        System.out.println("Returning to Dashboard ...");
+        Thread.sleep(5000);
+        Main.clearScreen();
     }
 
     public void sellCrypto(String symbol) throws InvalidCrypto {
@@ -112,7 +122,7 @@ public class User {
         } else {
             Crypto[] anotherArray = new Crypto[this.holdedCrypto.length - 1];
             for (int i = 0, k = 0; i < this.holdedCrypto.length; i++) {
-                if (this.holdedCrypto[i].symbol == symbol) {
+                if (this.holdedCrypto[i].symbol.equals(symbol)) {
                     Transaction t = new Transaction("OUT", this.holdedCrypto[i].totalValue, this.holdedCrypto[i].symbol);
                     this.addTransaction(t);
                     continue;
@@ -130,5 +140,42 @@ public class User {
             sum += this.holdedCrypto[i].totalValue;
         }
         return sum;
+    }
+
+    public void showHoldedCryptos() {
+        System.out.println("Your Holdings:");
+        System.out.println("Total Holdings Value: $" + this.getTotalCryptoValue());
+        System.out.println("-----");
+        for(int i=0; i<this.holdedCrypto.length; i++) {
+            System.out.println("Crypto Currency: " + this.holdedCrypto[i].name);
+            System.out.println("Total Holding: " + this.holdedCrypto[i].holding + " " + this.holdedCrypto[i].symbol);
+            System.out.println("Change Percentage: " + this.holdedCrypto[i].changePercentage + "%");
+            System.out.println("Total Value: $" + this.holdedCrypto[i].totalValue);
+            System.out.println("-----");
+        }
+    }
+
+    public void showTransactionHistory() {
+        System.out.println("Transaction History:");
+        System.out.println("-----");
+        for(int i=0; i<this.transactionHistory.length; i++) {
+            System.out.println("Transaction ID: " + this.transactionHistory[i].transactionId);
+            System.out.println("Transaction Type: " + this.transactionHistory[i].transactionType);
+            System.out.println("Currency: " + this.transactionHistory[i].currency);
+            System.out.println("Amount: $" + this.transactionHistory[i].amount);
+            System.out.println("-----");
+        }
+
+    }
+}
+
+
+class FetchUsernamePass {
+    String username;
+    String pass;
+
+    public FetchUsernamePass(String username, String pass) {
+        this.username = username;
+        this.pass = pass;
     }
 }
