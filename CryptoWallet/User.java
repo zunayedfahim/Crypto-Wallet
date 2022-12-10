@@ -91,7 +91,7 @@ public class User {
 
         // if the crypto is already in the holding
         for(int i=0; i<this.holdedCrypto.length; i++) {
-            if(this.holdedCrypto[i].symbol == c.symbol) {
+            if(this.holdedCrypto[i].symbol.equals(c.symbol)) {
                 this.holdedCrypto[i].totalValue += c.totalValue;
                 this.holdedCrypto[i].holding += c.holding;
                 Transaction t = new Transaction("IN", c.totalValue, c.symbol);
@@ -112,7 +112,6 @@ public class User {
         System.out.println(c.symbol + " added to your holdings.");
         System.out.println("Returning to Dashboard ...");
         Thread.sleep(5000);
-        Main.clearScreen();
     }
 
     public void sellCrypto(String symbol) throws InvalidCrypto {
@@ -131,6 +130,12 @@ public class User {
             }
             this.holdedCrypto = anotherArray;
             System.out.println(symbol + " SOLD!");
+            System.out.println("Returning to Dashboard ...");
+            try {
+                Thread.sleep(3000);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
         }
     }
 

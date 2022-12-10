@@ -5,9 +5,6 @@ import java.util.Arrays;
 import java.util.Scanner;
 import java.util.function.Function;
 
-// DUMMY FILE FOR TEST
-
-
 
 public class Main {
 
@@ -147,6 +144,7 @@ public class Main {
 
         Scanner inDashboard = new Scanner(System.in);
         char input = inDashboard.next().charAt(0);
+        input = Character.toUpperCase(input);
         clearScreen();
 
         boolean valid_input = false;
@@ -158,9 +156,9 @@ public class Main {
                 // take more inputs on add money function like medium [card or digital wallet]
                 // keep the deposit and withdraw function on the user class 
                 // transfer the add money function to user class and remove the islogged in selection statement.
-            } else if(input == 'W' || input == 'w') {
+            } else if(input == 'W') {
                 // TODO: withdraw money for HRIDI
-            } else if(input == 'B' || input == 'b') {
+            } else if(input == 'B') {
                 // buy crypto
                 System.out.println("Which crypto you want to buy?");
                 Crypto.showCryptoInfo();
@@ -168,6 +166,7 @@ public class Main {
                 System.out.print("Symbol: ");
                 Scanner inBuy = new Scanner(System.in);
                 String symbol = inBuy.next();
+                symbol = symbol.toUpperCase();
                 if(symbol=="#") {
                     Dashboard(user);
                 }
@@ -186,19 +185,21 @@ public class Main {
                 }
 
 
-            } else if(input == 'S' || input == 's') {
+            } else if(input == 'S') {
                 if(user.holdedCrypto.length>0) {
                     System.out.println("Which crypto you want to sell?");
                     user.showHoldedCryptos();
                     System.out.println("# : Dashboard");
                     System.out.print("Symbol: ");
                     String symbol = inDashboard.next();
+                    symbol = symbol.toUpperCase();
                     if(symbol=="#") {
                         Dashboard(user);
                     }
     
                     try {
                         user.sellCrypto(symbol);
+                        clearScreen();
                         Dashboard(user);
                     } catch (InvalidCrypto e) {
                         System.out.println(e);
@@ -214,16 +215,18 @@ public class Main {
                     Dashboard(user);
                 }
 
-            } else if(input == 'P' || input == 'p') {
+            } else if(input == 'P') {
                 Scanner inSwap = new Scanner(System.in);
                 System.out.println("Which Crypto you want to swap?");
                 user.showHoldedCryptos();
                 System.out.print("Symbol: ");
                 String fromCrypto = inSwap.next();
+                fromCrypto = fromCrypto.toUpperCase();
                 System.out.println("To which Crypto you want to swap?");
                 Crypto.showCryptoInfo();
                 System.out.print("Symbol: ");
                 String toCrypto = inSwap.next();
+                toCrypto = toCrypto.toUpperCase();
                 try {
                     user.swapCrypto(fromCrypto, toCrypto);
                 } catch (InvalidCrypto | InterruptedException e) {
@@ -237,7 +240,7 @@ public class Main {
                 }
                 clearScreen();
                 Dashboard(user);
-            } else if(input == 'H' || input == 'h') {
+            } else if(input == 'H') {
                 // holded cryptos 
                 user.showHoldedCryptos();
                 Scanner inHoldings = new Scanner(System.in);
@@ -252,7 +255,7 @@ public class Main {
                     QuitProgram();
                 }
 
-            } else if(input == 'T' || input == 't') {
+            } else if(input == 'T') {
                 // transaction history 
                 user.showTransactionHistory();
                 Scanner inTransaction = new Scanner(System.in);
@@ -267,7 +270,7 @@ public class Main {
                     QuitProgram();
                 }
 
-            } else if(input == 'Q' || input == 'q') {
+            } else if(input == 'Q') {
                 QuitProgram();
             }
         }
