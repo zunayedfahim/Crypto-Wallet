@@ -15,6 +15,18 @@ public class Crypto {
         new CryptoInfo("Litecoin", 76.74, "LTC", 0.1),
     };
 
+    public static void showCryptoInfo() {
+        System.out.println("Market Rate");
+        System.out.println("------");
+        for(int i=0; i<cryptoInfo.length; i++) {
+            System.out.println("Name: " + cryptoInfo[i].name);
+            System.out.println("Symbol: " + cryptoInfo[i].symbol);
+            System.out.println("Value: " + cryptoInfo[i].value);
+            System.out.println("Change Percentage: " + cryptoInfo[i].changePercentage + "%");
+            System.out.println("---");
+        }
+    }
+
     public Crypto(String symbol, double holding) throws InvalidCrypto {
         for(int i=0; i<cryptoInfo.length; i++) {
             if(cryptoInfo[i].symbol.equals(symbol)) {

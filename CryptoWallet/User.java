@@ -134,6 +134,27 @@ public class User {
         }
     }
 
+    public void swapCrypto(String fromCrypto, String toCrypto) throws InvalidCrypto, InterruptedException {
+        double fromTotal = 0;
+        double toValue = 0;
+        for(int i=0;i<this.holdedCrypto.length;i++) {
+            if(this.holdedCrypto[i].symbol.equals(fromCrypto)) {
+                fromTotal = this.holdedCrypto[i].totalValue;
+                for(int j=0; j<Crypto.cryptoInfo.length;j++) {
+                    if(Crypto.cryptoInfo[j].symbol.equals(toCrypto)) {
+                        toValue = Crypto.cryptoInfo[j].value;
+                    }
+                }
+            }
+        }
+        double reqHolding = fromTotal / toValue;
+        sellCrypto(fromCrypto);
+        Crypto c = new Crypto(toCrypto, reqHolding);
+        buyCrypto(c);
+
+        
+    }
+
     public double getTotalCryptoValue() {
         double sum = 0;
         for(int i=0; i<this.holdedCrypto.length; i++) {
@@ -141,7 +162,7 @@ public class User {
         }
         return sum;
     }
-
+      
     public void showHoldedCryptos() {
         System.out.println("Your Holdings:");
         System.out.println("Total Holdings Value: $" + this.getTotalCryptoValue());

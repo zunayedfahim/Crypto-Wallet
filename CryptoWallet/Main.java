@@ -3,6 +3,7 @@ package CryptoWallet;
 import java.io.Console;
 import java.util.Arrays;
 import java.util.Scanner;
+import java.util.function.Function;
 
 // DUMMY FILE FOR TEST
 
@@ -139,9 +140,9 @@ public class Main {
         System.out.println("W. Withdraw Money");
         System.out.println("B. Buy Crypto");
         System.out.println("S. Sell Crypto");
+        System.out.println("P. Swap Crypto");
         System.out.println("H. Current Holdings");
         System.out.println("T. Transaction History");
-
         System.out.println("Q. Quit Program");
 
         Scanner inDashboard = new Scanner(System.in);
@@ -153,18 +154,18 @@ public class Main {
         while (!valid_input) {
             if (input == 'A' || input == 'a') {
                 // TODO: add money for HRIDI
+                // take input here and pass it to add money function 
+                // take more inputs on add money function like medium [card or digital wallet]
+                // keep the deposit and withdraw function on the user class 
+                // transfer the add money function to user class and remove the islogged in selection statement.
             } else if(input == 'W' || input == 'w') {
                 // TODO: withdraw money for HRIDI
             } else if(input == 'B' || input == 'b') {
                 // buy crypto
                 System.out.println("Which crypto you want to buy?");
-                System.out.println("BTC : Bitcoin");
-                System.out.println("ETH : Ethereum");
-                System.out.println("DOGE : Dogecoin");
-                System.out.println("DOT : Polkadot");
-                System.out.println("LTC : Litecoin");
+                Crypto.showCryptoInfo();
                 System.out.println("# : Dashboard");
-                System.out.print("Coin: ");
+                System.out.print("Symbol: ");
                 Scanner inBuy = new Scanner(System.in);
                 String symbol = inBuy.next();
                 if(symbol=="#") {
@@ -188,11 +189,9 @@ public class Main {
             } else if(input == 'S' || input == 's') {
                 if(user.holdedCrypto.length>0) {
                     System.out.println("Which crypto you want to sell?");
-                    for(int i=0; i<user.holdedCrypto.length; i++) {
-                        System.out.println(user.holdedCrypto[i].symbol + ": " + user.holdedCrypto[i].name);
-                    }
+                    user.showHoldedCryptos();
                     System.out.println("# : Dashboard");
-                    System.out.print("Coin: ");
+                    System.out.print("Symbol: ");
                     String symbol = inDashboard.next();
                     if(symbol=="#") {
                         Dashboard(user);
@@ -215,6 +214,29 @@ public class Main {
                     Dashboard(user);
                 }
 
+            } else if(input == 'P' || input == 'p') {
+                Scanner inSwap = new Scanner(System.in);
+                System.out.println("Which Crypto you want to swap?");
+                user.showHoldedCryptos();
+                System.out.print("Symbol: ");
+                String fromCrypto = inSwap.next();
+                System.out.println("To which Crypto you want to swap?");
+                Crypto.showCryptoInfo();
+                System.out.print("Symbol: ");
+                String toCrypto = inSwap.next();
+                try {
+                    user.swapCrypto(fromCrypto, toCrypto);
+                } catch (InvalidCrypto | InterruptedException e) {
+                    e.printStackTrace();
+                }
+                System.out.println("We have swapped your " + fromCrypto + " to " + toCrypto);
+                try {
+                    Thread.sleep(3000);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+                clearScreen();
+                Dashboard(user);
             } else if(input == 'H' || input == 'h') {
                 // holded cryptos 
                 user.showHoldedCryptos();
