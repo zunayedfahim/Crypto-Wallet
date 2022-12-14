@@ -21,10 +21,23 @@ public class User {
     Crypto[] holdedCrypto = {};
     Transaction[] transactionHistory = {};
 
-    public User(String fullName, String email, String username, String pass, String NID, String phoneNumber) throws Exception {
+    String addMoneyMedium;
+    double amount;
+	static String[] addMoneyMediums = {
+		"card",
+		"bkash",	
+		"paypal"
+	};
+
+    // public User(String fullName, String email, String username, String pass, String NID, String phoneNumber, double currentBalance) {
+
+    // }
+
+    public User(String fullName, String email, String username, String pass, String NID, String phoneNumber, double currentBalance) throws Exception {
         this.userId = UUID.randomUUID().toString();
         this.fullName = fullName;
         this.pass = hashPassword(pass);
+        this.currentBalance = currentBalance;
         
 
         // Check username
@@ -87,19 +100,53 @@ public class User {
         this.transactionHistory[this.transactionHistory.length - 1] = t;
     }
 
-    public void buyCrypto(Crypto c) throws InterruptedException {
+    public void deposit(double amount) {
+    	System.out.println("amount is "+amount);
+    	currentBalance += amount;
+        Transaction t = new Transaction("IN", amount);
+        this.addTransaction(t);
+    }
+
+    
+    // withdraw
+    public void withdraw(double amount) {
+    	if(amount<=currentBalance){
+    		currentBalance -= amount;
+            Transaction t = new Transaction("OUT", amount); 
+            this.addTransaction(t);   		
+    	}else {
+    		System.err.print("Insufficient Balance");
+    	}
+    }
+
+    public void callMedium(String addMoneyMedium,double amount) {
+    	if(Arrays.asList(addMoneyMediums).contains(addMoneyMedium)){
+			this.addMoneyMedium = addMoneyMedium;
+			this.amount= amount;
+			deposit(amount);
+            
+		}else if (addMoneyMedium ==""){
+            System.err.println("Medium of transaction is required");
+		}else {
+			System.err.println("Invalid Medium of transaction!");
+		}
+    }
+
+    public void buyCrypto(Crypto c) throws InterruptedException, InsufficientBalance {
+
+        if(this.currentBalance < c.totalValue) {
+            throw new InsufficientBalance("You do not have sufficient balance.");
+        }
 
         // if the crypto is already in the holding
         for(int i=0; i<this.holdedCrypto.length; i++) {
             if(this.holdedCrypto[i].symbol.equals(c.symbol)) {
                 this.holdedCrypto[i].totalValue += c.totalValue;
                 this.holdedCrypto[i].holding += c.holding;
+                this.currentBalance -= c.totalValue;
                 Transaction t = new Transaction("IN", c.totalValue, c.symbol);
                 this.addTransaction(t);
                 System.out.println(c.symbol + " added to your holdings.");
-                System.out.println("Returning to Dashboard ...");
-                Thread.sleep(5000);
-                Main.clearScreen();
                 return;
             }
         }
@@ -107,11 +154,11 @@ public class User {
         // if the crypto is not in the holding
         this.holdedCrypto = Arrays.copyOf(this.holdedCrypto, this.holdedCrypto.length + 1);
         this.holdedCrypto[this.holdedCrypto.length - 1] = c;
+        this.currentBalance -= c.totalValue;
         Transaction t = new Transaction("IN", c.totalValue, c.symbol);
         this.addTransaction(t);
         System.out.println(c.symbol + " added to your holdings.");
-        System.out.println("Returning to Dashboard ...");
-        Thread.sleep(5000);
+        
     }
 
     public void sellCrypto(String symbol) throws InvalidCrypto {
@@ -122,6 +169,7 @@ public class User {
             Crypto[] anotherArray = new Crypto[this.holdedCrypto.length - 1];
             for (int i = 0, k = 0; i < this.holdedCrypto.length; i++) {
                 if (this.holdedCrypto[i].symbol.equals(symbol)) {
+                    this.currentBalance += this.holdedCrypto[i].totalValue;
                     Transaction t = new Transaction("OUT", this.holdedCrypto[i].totalValue, this.holdedCrypto[i].symbol);
                     this.addTransaction(t);
                     continue;
@@ -139,7 +187,7 @@ public class User {
         }
     }
 
-    public void swapCrypto(String fromCrypto, String toCrypto) throws InvalidCrypto, InterruptedException {
+    public void swapCrypto(String fromCrypto, String toCrypto) throws InvalidCrypto, InterruptedException, InsufficientBalance {
         double fromTotal = 0;
         double toValue = 0;
         for(int i=0;i<this.holdedCrypto.length;i++) {
@@ -196,12 +244,8 @@ public class User {
 }
 
 
-class FetchUsernamePass {
+class FetchUser {
+    String userId;
     String username;
-    String pass;
-
-    public FetchUsernamePass(String username, String pass) {
-        this.username = username;
-        this.pass = pass;
-    }
+    String password;
 }

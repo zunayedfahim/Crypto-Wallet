@@ -71,58 +71,11 @@ public class Main {
         // }
         
 
-        User ob = new User("Zunayed", "fahim@gmail.com", "zunayed", "pass", "9165177958", "01842326680");
-
-        // Transaction t = new Transaction("IN", 500);
-        // ob.addTransaction(t);
-        // System.out.println(ob.transactionHistory[0].currency);
-
-        // Crypto c = new Crypto("BTC", 1.25);
-        // ob.buyCrypto(c);
-        
-        // Crypto e = new Crypto("ETH", 2);
-        // ob.buyCrypto(e);
-
-        // ob.sellCrypto("BTC");
-        // System.out.println(ob.holdedCrypto.length);
-
+        User ob = new User("Zunayed", "fahim@gmail.com", "zunayed", "pass", "9165177958", "01842326680", 5000);
         Dashboard(ob);
+
     }
 
-    public static User SignIn(String username, String pass, User[] users) throws Exception{
-        for(int i = 0; i < users.length; i++){
-            if(username.equals(users[i].username)){
-                System.out.println(pass);
-                String password = User.hashPassword(pass);
-                if(password.equals(users[i].pass)){
-                    users[i].isLoggedIn = true;
-                    System.out.println("Sign in Successful");
-                    // TODO: For Neha: fetch the exact user from databse
-                    // create user object 
-                    // fetch holded crypto and fill object.holdedCrypto
-                    // fetch transactionHistory crypto and fill object.transactionHistory
-                    return users[i];
-                } else {
-                    throw new Exception("Password didn't match.");
-                }
-            }
-        }
-        throw new Exception("Login Failed");
-    }
-
-    public static void SignOut(User ob){
-        ob.isLoggedIn = false;
-        System.out.println("Logged out of " + ob.username);
-    }
-
-    public static void SignUp(User user) {
-        // ***
-        // For Neha: Destructure the User object and push it to the database
-        // ***
-    }
-
-
-    
     public static void Dashboard(User user) {
         // username
         System.out.println("You are logged in as - " + user.username);
@@ -151,13 +104,30 @@ public class Main {
 
         while (!valid_input) {
             if (input == 'A' || input == 'a') {
-                // TODO: add money for HRIDI
-                // take input here and pass it to add money function 
-                // take more inputs on add money function like medium [card or digital wallet]
-                // keep the deposit and withdraw function on the user class 
-                // transfer the add money function to user class and remove the islogged in selection statement.
+                Scanner sc = new Scanner(System.in);
+            	double addablemoney;
+            	System.out.println("Supported Mediums to add money:\n1.\tCard\n2.\tbKash\n3.\tPaypal");
+            	System.out.println("Enter Medium for adding money:");
+            	String medium = sc.next();
+            	medium = medium.toLowerCase();
+            	if (medium =="#") {
+            		Dashboard(user);
+            	}
+            	System.out.print("Enter Deposit amount: ");
+            	addablemoney = sc.nextDouble();
+            	try {
+            		user.callMedium(medium, addablemoney);
+                	System.out.println(addablemoney+" Tk is deposited to "+ user.username);
+                	returnToDashboard(user);
+            	}catch(Exception e) {
+            		e.printStackTrace();
+            	}
             } else if(input == 'W') {
-                // TODO: withdraw money for HRIDI
+                System.out.print("Enter amount to Withdraw: ");
+            	double Wmoney = inDashboard.nextDouble();
+            	user.withdraw(Wmoney);
+            	System.out.println(Wmoney+" Tk is withdrawn from "+user.username);
+                returnToDashboard(user);
             } else if(input == 'B') {
                 // buy crypto
                 System.out.println("Which crypto you want to buy?");
@@ -199,20 +169,14 @@ public class Main {
     
                     try {
                         user.sellCrypto(symbol);
-                        clearScreen();
-                        Dashboard(user);
+                        returnToDashboard(user);
                     } catch (InvalidCrypto e) {
                         System.out.println(e);
                         Dashboard(user);
                     }
                 } else {
                     System.out.println("You do not have any crypto in your holdings.");
-                    try {
-                        Thread.sleep(3000);
-                    } catch (InterruptedException e) {
-                        e.printStackTrace();
-                    }
-                    Dashboard(user);
+                    returnToDashboard(user);
                 }
 
             } else if(input == 'P') {
@@ -229,17 +193,11 @@ public class Main {
                 toCrypto = toCrypto.toUpperCase();
                 try {
                     user.swapCrypto(fromCrypto, toCrypto);
-                } catch (InvalidCrypto | InterruptedException e) {
+                } catch (Exception e) {
                     e.printStackTrace();
                 }
                 System.out.println("We have swapped your " + fromCrypto + " to " + toCrypto);
-                try {
-                    Thread.sleep(3000);
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
-                clearScreen();
-                Dashboard(user);
+                returnToDashboard(user);
             } else if(input == 'H') {
                 // holded cryptos 
                 user.showHoldedCryptos();
@@ -277,6 +235,49 @@ public class Main {
 
     }
 
+    public static User SignIn(String username, String pass, User[] users) throws Exception{
+        for(int i = 0; i < users.length; i++){
+            if(username.equals(users[i].username)){
+                System.out.println(pass);
+                String password = User.hashPassword(pass);
+                if(password.equals(users[i].pass)){
+                    users[i].isLoggedIn = true;
+                    System.out.println("Sign in Successful");
+                    // TODO: For Neha: fetch the exact user from databse
+                    // create user object 
+                    // fetch holded crypto and fill object.holdedCrypto
+                    // fetch transactionHistory crypto and fill object.transactionHistory
+                    return users[i];
+                } else {
+                    throw new Exception("Password didn't match.");
+                }
+            }
+        }
+        throw new Exception("Login Failed");
+    }
+
+    public static void SignOut(User ob){
+        ob.isLoggedIn = false;
+        System.out.println("Logged out of " + ob.username);
+    }
+
+    public static void SignUp(User user) {
+        // ***
+        // For Neha: Destructure the User object and push it to the database
+        // ***
+    }
+    
+    public static void returnToDashboard(User user) {
+        System.out.print("Returning to Dashboard ...");
+        try {
+            Thread.sleep(3000);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+        clearScreen();
+        Dashboard(user);
+    }
+
     public static void clearScreen() {  
         System.out.print("\033[H\033[2J");  
         System.out.flush();  
@@ -297,6 +298,19 @@ public class Main {
         System.exit(0);
     }
 
+    public static void fetchUsers() {
+        // return userId, username and passsword of every user.
+    }
+
+    public static void fetchUserDetail(String userId) {
+        // fetch all the information from the user using userId 
+        // create an object of the User class and pass all the information gathered from the database
+        // return the user object
+    }
+
+    public static void updateDatabase(User user) {
+        // update the database before terminating the program
+    }
 
 }
 
