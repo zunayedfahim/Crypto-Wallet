@@ -3,7 +3,8 @@ package CryptoWallet;
 import java.io.Console;
 import java.util.Arrays;
 import java.util.Scanner;
-import java.util.function.Function;
+import java.util.UUID;
+
 
 
 public class Main {
@@ -13,66 +14,70 @@ public class Main {
 
         
 
-        // // Welcome Note
-        // System.out.println("Welcome to Cryptox");
-        // System.out.print("Press - L to Login, R to Register or Q to Quit:");
+        // Welcome Note
+        clearScreen();
+        System.out.println("Welcome to Cryptox");
+        System.out.print("Press - L to Login, R to Register or Q to Quit:");
 
-        // // Take Input
-        // Scanner takeInput = new Scanner(System.in);
-        // char input = takeInput.next().charAt(0);
+        // Take Input
+        Scanner takeInput = new Scanner(System.in);
+        char input = takeInput.next().charAt(0);
+        clearScreen();
 
-        // boolean valid_input = false;
+        boolean valid_input = false;
 
-        // while (!valid_input) {
-        //     if(input=='L' || input=='l') {
+        while (!valid_input) {
+            if(input=='L' || input=='l') {
         // ***
         // For Neha: fetch only username and pass from database and fill it in the array.
-        // FetchUsernamePass[] users = {
-        //     new FetchUsernamePass(userId, username, pass),
-        //     new FetchUsernamePass(userId, username, pass),
-        //     new FetchUsernamePass(userId, username, pass)
-        // };
-        // // ***
-        //         // Take input for login
-        //         System.out.println("Login");
-        //         System.out.print("Username:");
-        //         String username = takeInput.next();
-        //         Console console = System.console() ;
-        //         char[] password = console.readPassword("Password: ");
-        //         String pass = new String(password);
-        //         User user = SignIn(username, pass, users);
-        //         // TODO: Redirect to Dashboard
+        FetchUser[] users = Database.fetchUsers();
+        // ***
+                // Take input for login
+                System.out.println("Login");
+                System.out.print("Username:");
+                String username = takeInput.next();
+                Console console = System.console() ;
+                char[] password = console.readPassword("Password: ");
+                String pass = new String(password);
+                User user = SignIn(username, pass, users);
+                // TODO: Redirect to Dashboard
+                Dashboard(user);
 
-        //     } else if(input=='R' || input=='r') {
+            } else if(input=='R' || input=='r') {
 
-        //         // Take input for signup
-        //         Scanner in = new Scanner(System.in);
-        //         System.out.print("Full Name:");
-        //         String fullName = in.nextLine();
-        //         System.out.print("Email:");
-        //         String email = in.next();
-        //         System.out.print("Username:");
-        //         String username = in.next();
-        //         Console console = System.console() ;
-        //         char[] password = console.readPassword("Password: ");
-        //         String pass = new String(password);
-        //         System.out.print("NID:");
-        //         String NID = in.next();
-        //         System.out.print("Phone Number:");
-        //         String phoneNumber = in.next();
-
-        //         User user = new User(fullName, email, username, pass, NID, phoneNumber);
-        //         SignUp(user);
+                // Take input for signup
+                Scanner in = new Scanner(System.in);
+                System.out.print("Full Name:");
+                String fullName = in.nextLine();
+                System.out.print("Email:");
+                String email = in.next();
+                System.out.print("Username:");
+                String username = in.next();
+                Console console = System.console() ;
+                char[] password = console.readPassword("Password: ");
+                String pass = new String(password);
+                System.out.print("NID:");
+                String NID = in.next();
+                System.out.print("Phone Number:");
+                String phoneNumber = in.next();
+                // FIXME: work with userId
+                User user = new User("1", fullName, email, username, pass, NID, phoneNumber, 0.0);
+                SignUp(user);
 
 
-        //     } else if(input=='Q' || input=='q') {
-                    // QuitProgram();
-        //     }
-        // }
+            } else if(input=='Q' || input=='q') {
+                    QuitProgram();
+            }
+        }
         
 
-        User ob = new User("Zunayed", "fahim@gmail.com", "zunayed", "pass", "9165177958", "01842326680", 5000);
-        Dashboard(ob);
+        // FetchUser[] users = Database.fetchUsers();
+        // System.out.println(users[0].userId);
+
+        // User user = Database.fetchUserDetails("1");
+        // System.out.println(user.username);
+        // User ob = new User("1", "Zunayed", "fahim@gmail.com", "zunayed", "pass", "9165177958", "01842326680", 5000);
+        // Dashboard(ob);
 
     }
 
@@ -103,7 +108,7 @@ public class Main {
         boolean valid_input = false;
 
         while (!valid_input) {
-            if (input == 'A' || input == 'a') {
+            if (input == 'A') {
                 Scanner sc = new Scanner(System.in);
             	double addablemoney;
             	System.out.println("Supported Mediums to add money:\n1.\tCard\n2.\tbKash\n3.\tPaypal");
@@ -120,7 +125,8 @@ public class Main {
                 	System.out.println(addablemoney+" Tk is deposited to "+ user.username);
                 	returnToDashboard(user);
             	}catch(Exception e) {
-            		e.printStackTrace();
+            		System.out.println(e);
+                    returnToDashboard(user);
             	}
             } else if(input == 'W') {
                 System.out.print("Enter amount to Withdraw: ");
@@ -146,12 +152,10 @@ public class Main {
                 try {
                     Crypto c = new Crypto(symbol, holding);
                     user.buyCrypto(c);
-                    clearScreen();
-                    Dashboard(user);
+                    returnToDashboard(user);
                 } catch (Exception e) {
                     System.out.println(e);
-                    clearScreen();
-                    Dashboard(user);
+                    returnToDashboard(user);
                 }
 
 
@@ -172,7 +176,7 @@ public class Main {
                         returnToDashboard(user);
                     } catch (InvalidCrypto e) {
                         System.out.println(e);
-                        Dashboard(user);
+                        returnToDashboard(user);
                     }
                 } else {
                     System.out.println("You do not have any crypto in your holdings.");
@@ -194,7 +198,8 @@ public class Main {
                 try {
                     user.swapCrypto(fromCrypto, toCrypto);
                 } catch (Exception e) {
-                    e.printStackTrace();
+                    System.out.println(e);
+                    returnToDashboard(user);
                 }
                 System.out.println("We have swapped your " + fromCrypto + " to " + toCrypto);
                 returnToDashboard(user);
@@ -235,19 +240,17 @@ public class Main {
 
     }
 
-    public static User SignIn(String username, String pass, User[] users) throws Exception{
+    public static User SignIn(String username, String pass, FetchUser[] users) throws Exception{
         for(int i = 0; i < users.length; i++){
             if(username.equals(users[i].username)){
-                System.out.println(pass);
                 String password = User.hashPassword(pass);
-                if(password.equals(users[i].pass)){
-                    users[i].isLoggedIn = true;
+                if(password.equals(users[i].password)){
                     System.out.println("Sign in Successful");
                     // TODO: For Neha: fetch the exact user from databse
                     // create user object 
                     // fetch holded crypto and fill object.holdedCrypto
                     // fetch transactionHistory crypto and fill object.transactionHistory
-                    return users[i];
+                    return Database.fetchUserDetails(users[i].userId);
                 } else {
                     throw new Exception("Password didn't match.");
                 }
@@ -298,19 +301,7 @@ public class Main {
         System.exit(0);
     }
 
-    public static void fetchUsers() {
-        // return userId, username and passsword of every user.
-    }
-
-    public static void fetchUserDetail(String userId) {
-        // fetch all the information from the user using userId 
-        // create an object of the User class and pass all the information gathered from the database
-        // return the user object
-    }
-
-    public static void updateDatabase(User user) {
-        // update the database before terminating the program
-    }
+    
 
 }
 

@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<classpath>
+	<classpathentry kind="src" path=""/>
+	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/JavaSE-11"/>
+	<classpathentry kind="lib" path="UCanAccessLib/commons-lang3-3.8.1.jar"/>
+	<classpathentry kind="lib" path="UCanAccessLib/commons-logging-1.2.jar"/>
+	<classpathentry kind="lib" path="UCanAccessLib/hsqldb-2.5.0.jar"/>
+	<classpathentry kind="lib" path="UCanAccessLib/jackcess-3.0.1.jar"/>
+	<classpathentry kind="lib" path="UCanAccessLib/ucanaccess-5.0.1.jar"/>
+	<classpathentry kind="output" path="bin"/>
+</classpath>

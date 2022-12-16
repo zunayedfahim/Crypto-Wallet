@@ -1,5 +1,6 @@
 package CryptoWallet;
 
+
 public class Crypto {
     String name;
     double totalValue;

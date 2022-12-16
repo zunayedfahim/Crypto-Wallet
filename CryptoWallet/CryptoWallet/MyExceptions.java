@@ -1,5 +1,6 @@
 package CryptoWallet;
 
+
 class InvalidCrypto extends Exception {
     public InvalidCrypto(String message) {
         super(message);

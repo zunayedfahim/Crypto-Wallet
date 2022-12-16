@@ -1,42 +1,39 @@
 package CryptoWallet;
 
+
 import java.math.BigInteger;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.Arrays;
-import java.util.UUID;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class User {
-    String userId;
-    String fullName;
-    String email;
-    String username;
-    String pass;
-    String NID;
-    String phoneNumber;
-    double currentBalance;
-    boolean isLoggedIn;
-    Crypto[] holdedCrypto = {};
-    Transaction[] transactionHistory = {};
+    public String userId;
+    public String fullName;
+    public String email;
+    public String username;
+    public String pass;
+    public String NID;
+    public String phoneNumber;
+    public double currentBalance;
+    public boolean isLoggedIn;
+    public Crypto[] holdedCrypto = {};
+    public Transaction[] transactionHistory = {};
 
-    String addMoneyMedium;
-    double amount;
-	static String[] addMoneyMediums = {
+    public String addMoneyMedium;
+    public double amount;
+    public static String[] addMoneyMediums = {
 		"card",
 		"bkash",	
 		"paypal"
 	};
 
-    // public User(String fullName, String email, String username, String pass, String NID, String phoneNumber, double currentBalance) {
+    
 
-    // }
-
-    public User(String fullName, String email, String username, String pass, String NID, String phoneNumber, double currentBalance) throws Exception {
-        this.userId = UUID.randomUUID().toString();
+    public User(String userId, String fullName, String email, String username, String NID, String phoneNumber, double currentBalance) throws Exception {
+        this.userId = userId;
         this.fullName = fullName;
-        this.pass = hashPassword(pass);
         this.currentBalance = currentBalance;
         
 
@@ -74,6 +71,11 @@ public class User {
             throw new InvalidPhoneNumber("Invalid Phone Number");
         }
     }
+
+    public User(String userId, String fullName, String email, String username, String pass, String NID, String phoneNumber, double currentBalance) throws Exception {
+		this(userId, fullName, email, username, NID, phoneNumber, currentBalance);
+		this.pass = hashPassword(pass);
+	}
 
     public static String hashPassword(String pass) {
         try {
@@ -178,12 +180,7 @@ public class User {
             }
             this.holdedCrypto = anotherArray;
             System.out.println(symbol + " SOLD!");
-            System.out.println("Returning to Dashboard ...");
-            try {
-                Thread.sleep(3000);
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
+            return;
         }
     }
 
@@ -241,11 +238,11 @@ public class User {
         }
 
     }
+
+    public void addCryptoToHoldings(Crypto c) {
+    	this.holdedCrypto = Arrays.copyOf(this.holdedCrypto, this.holdedCrypto.length + 1);
+        this.holdedCrypto[this.holdedCrypto.length - 1] = c;
+        this.currentBalance -= c.totalValue;
+    }
 }
 
-
-class FetchUser {
-    String userId;
-    String username;
-    String password;
-}
