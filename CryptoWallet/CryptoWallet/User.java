@@ -4,6 +4,8 @@ package CryptoWallet;
 import java.math.BigInteger;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.Arrays;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -100,11 +102,19 @@ public class User {
     public void addTransaction(Transaction t) {
         this.transactionHistory = Arrays.copyOf(this.transactionHistory, this.transactionHistory.length + 1);
         this.transactionHistory[this.transactionHistory.length - 1] = t;
+        Database.addTransactionToDatabase(this.userId, t);
+    }
+
+    public void addCryptoToHoldings(Crypto c) {
+    	this.holdedCrypto = Arrays.copyOf(this.holdedCrypto, this.holdedCrypto.length + 1);
+        this.holdedCrypto[this.holdedCrypto.length - 1] = c;
+        this.currentBalance -= c.totalValue;
     }
 
     public void deposit(double amount) {
     	System.out.println("amount is "+amount);
     	currentBalance += amount;
+        Database.updateCurrentBalance(this.userId, this.currentBalance);
         Transaction t = new Transaction("IN", amount);
         this.addTransaction(t);
     }
@@ -114,6 +124,7 @@ public class User {
     public void withdraw(double amount) {
     	if(amount<=currentBalance){
     		currentBalance -= amount;
+            Database.updateCurrentBalance(this.userId, this.currentBalance);
             Transaction t = new Transaction("OUT", amount); 
             this.addTransaction(t);   		
     	}else {
@@ -146,8 +157,11 @@ public class User {
                 this.holdedCrypto[i].totalValue += c.totalValue;
                 this.holdedCrypto[i].holding += c.holding;
                 this.currentBalance -= c.totalValue;
+                Database.updateCurrentBalance(this.userId, this.currentBalance);
                 Transaction t = new Transaction("IN", c.totalValue, c.symbol);
                 this.addTransaction(t);
+                c.holding = this.holdedCrypto[i].holding;
+                Database.updateRowInHoldings(this.userId, c);
                 System.out.println(c.symbol + " added to your holdings.");
                 return;
             }
@@ -157,8 +171,10 @@ public class User {
         this.holdedCrypto = Arrays.copyOf(this.holdedCrypto, this.holdedCrypto.length + 1);
         this.holdedCrypto[this.holdedCrypto.length - 1] = c;
         this.currentBalance -= c.totalValue;
+        Database.updateCurrentBalance(this.userId, this.currentBalance);
         Transaction t = new Transaction("IN", c.totalValue, c.symbol);
         this.addTransaction(t);
+        Database.addRowToHoldings(this.userId, c);
         System.out.println(c.symbol + " added to your holdings.");
         
     }
@@ -172,6 +188,7 @@ public class User {
             for (int i = 0, k = 0; i < this.holdedCrypto.length; i++) {
                 if (this.holdedCrypto[i].symbol.equals(symbol)) {
                     this.currentBalance += this.holdedCrypto[i].totalValue;
+                    Database.updateCurrentBalance(this.userId, this.currentBalance);
                     Transaction t = new Transaction("OUT", this.holdedCrypto[i].totalValue, this.holdedCrypto[i].symbol);
                     this.addTransaction(t);
                     continue;
@@ -179,6 +196,7 @@ public class User {
                 anotherArray[k++] = this.holdedCrypto[i];
             }
             this.holdedCrypto = anotherArray;
+            Database.removeRowFromHoldings(this.userId, symbol);
             System.out.println(symbol + " SOLD!");
             return;
         }
@@ -201,8 +219,7 @@ public class User {
         sellCrypto(fromCrypto);
         Crypto c = new Crypto(toCrypto, reqHolding);
         buyCrypto(c);
-
-        
+        System.out.println("We have swapped your " + fromCrypto + " to " + toCrypto);
     }
 
     public double getTotalCryptoValue() {
@@ -234,15 +251,15 @@ public class User {
             System.out.println("Transaction Type: " + this.transactionHistory[i].transactionType);
             System.out.println("Currency: " + this.transactionHistory[i].currency);
             System.out.println("Amount: $" + this.transactionHistory[i].amount);
+
+            LocalDateTime dateTime = this.transactionHistory[i].dateTime;
+            DateTimeFormatter customFormat = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");;
+            String formattedString = dateTime.format(customFormat);
+            System.out.println("Date & Time: " + formattedString);
             System.out.println("-----");
         }
 
     }
 
-    public void addCryptoToHoldings(Crypto c) {
-    	this.holdedCrypto = Arrays.copyOf(this.holdedCrypto, this.holdedCrypto.length + 1);
-        this.holdedCrypto[this.holdedCrypto.length - 1] = c;
-        this.currentBalance -= c.totalValue;
-    }
 }
 

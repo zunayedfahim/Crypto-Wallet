@@ -5,6 +5,8 @@ import java.util.Arrays;
 import java.util.Scanner;
 import java.util.UUID;
 
+import javax.xml.crypto.Data;
+
 
 
 public class Main {
@@ -12,7 +14,6 @@ public class Main {
 
     public static void main(String args[]) throws Exception {
 
-        
 
         // Welcome Note
         clearScreen();
@@ -25,13 +26,11 @@ public class Main {
         clearScreen();
 
         boolean valid_input = false;
+        FetchUser[] users = Database.fetchUsers();
 
         while (!valid_input) {
             if(input=='L' || input=='l') {
-        // ***
-        // For Neha: fetch only username and pass from database and fill it in the array.
-        FetchUser[] users = Database.fetchUsers();
-        // ***
+
                 // Take input for login
                 System.out.println("Login");
                 System.out.print("Username:");
@@ -40,13 +39,14 @@ public class Main {
                 char[] password = console.readPassword("Password: ");
                 String pass = new String(password);
                 User user = SignIn(username, pass, users);
-                // TODO: Redirect to Dashboard
+                clearScreen();
                 Dashboard(user);
 
             } else if(input=='R' || input=='r') {
 
                 // Take input for signup
                 Scanner in = new Scanner(System.in);
+                System.out.println("Register");
                 System.out.print("Full Name:");
                 String fullName = in.nextLine();
                 System.out.print("Email:");
@@ -60,24 +60,19 @@ public class Main {
                 String NID = in.next();
                 System.out.print("Phone Number:");
                 String phoneNumber = in.next();
-                // FIXME: work with userId
-                User user = new User("1", fullName, email, username, pass, NID, phoneNumber, 0.0);
-                SignUp(user);
+                String userId = String.valueOf(users.length + 1);
+                User user = new User(userId, fullName, email, username, pass, NID, phoneNumber, 0.0);
+                Database.addUserToDatabase(user);
+                clearScreen();
+                Dashboard(user);
 
 
             } else if(input=='Q' || input=='q') {
-                    QuitProgram();
+                QuitProgram();
             }
         }
         
 
-        // FetchUser[] users = Database.fetchUsers();
-        // System.out.println(users[0].userId);
-
-        // User user = Database.fetchUserDetails("1");
-        // System.out.println(user.username);
-        // User ob = new User("1", "Zunayed", "fahim@gmail.com", "zunayed", "pass", "9165177958", "01842326680", 5000);
-        // Dashboard(ob);
 
     }
 
@@ -201,7 +196,6 @@ public class Main {
                     System.out.println(e);
                     returnToDashboard(user);
                 }
-                System.out.println("We have swapped your " + fromCrypto + " to " + toCrypto);
                 returnToDashboard(user);
             } else if(input == 'H') {
                 // holded cryptos 
@@ -240,16 +234,12 @@ public class Main {
 
     }
 
-    public static User SignIn(String username, String pass, FetchUser[] users) throws Exception{
+    public static User SignIn(String username, String pass, FetchUser[] users) throws Exception {
         for(int i = 0; i < users.length; i++){
             if(username.equals(users[i].username)){
                 String password = User.hashPassword(pass);
                 if(password.equals(users[i].password)){
                     System.out.println("Sign in Successful");
-                    // TODO: For Neha: fetch the exact user from databse
-                    // create user object 
-                    // fetch holded crypto and fill object.holdedCrypto
-                    // fetch transactionHistory crypto and fill object.transactionHistory
                     return Database.fetchUserDetails(users[i].userId);
                 } else {
                     throw new Exception("Password didn't match.");
@@ -264,12 +254,6 @@ public class Main {
         System.out.println("Logged out of " + ob.username);
     }
 
-    public static void SignUp(User user) {
-        // ***
-        // For Neha: Destructure the User object and push it to the database
-        // ***
-    }
-    
     public static void returnToDashboard(User user) {
         System.out.print("Returning to Dashboard ...");
         try {
@@ -295,9 +279,6 @@ public class Main {
             e.printStackTrace();
         }
         clearScreen();
-
-
-        // For Neha: Update the user info to the database
         System.exit(0);
     }
 
