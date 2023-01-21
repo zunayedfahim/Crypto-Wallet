@@ -3,10 +3,6 @@ package CryptoWallet;
 import java.io.Console;
 import java.util.Arrays;
 import java.util.Scanner;
-import java.util.UUID;
-
-import javax.xml.crypto.Data;
-
 
 
 public class Main {
@@ -38,9 +34,9 @@ public class Main {
                 Console console = System.console() ;
                 char[] password = console.readPassword("Password: ");
                 String pass = new String(password);
-                User user = SignIn(username, pass, users);
+                User user = signIn(username, pass, users);
                 clearScreen();
-                Dashboard(user);
+                dashboard(user);
 
             } else if(input=='R' || input=='r') {
 
@@ -64,11 +60,11 @@ public class Main {
                 User user = new User(userId, fullName, email, username, pass, NID, phoneNumber, 0.0);
                 Database.addUserToDatabase(user);
                 clearScreen();
-                Dashboard(user);
+                dashboard(user);
 
 
             } else if(input=='Q' || input=='q') {
-                QuitProgram();
+                quitProgram();
             }
         }
         
@@ -76,7 +72,7 @@ public class Main {
 
     }
 
-    public static void Dashboard(User user) {
+    public static void dashboard(User user) {
         // username
         System.out.println("You are logged in as - " + user.username);
 
@@ -95,8 +91,8 @@ public class Main {
         System.out.println("T. Transaction History");
         System.out.println("Q. Quit Program");
 
-        Scanner inDashboard = new Scanner(System.in);
-        char input = inDashboard.next().charAt(0);
+        Scanner indashboard = new Scanner(System.in);
+        char input = indashboard.next().charAt(0);
         input = Character.toUpperCase(input);
         clearScreen();
 
@@ -111,7 +107,8 @@ public class Main {
             	String medium = sc.next();
             	medium = medium.toLowerCase();
             	if (medium =="#") {
-            		Dashboard(user);
+                    clearScreen();
+            		dashboard(user);
             	}
             	System.out.print("Enter Deposit amount: ");
             	addablemoney = sc.nextDouble();
@@ -125,7 +122,7 @@ public class Main {
             	}
             } else if(input == 'W') {
                 System.out.print("Enter amount to Withdraw: ");
-            	double Wmoney = inDashboard.nextDouble();
+            	double Wmoney = indashboard.nextDouble();
             	user.withdraw(Wmoney);
             	System.out.println(Wmoney+" Tk is withdrawn from "+user.username);
                 returnToDashboard(user);
@@ -133,13 +130,14 @@ public class Main {
                 // buy crypto
                 System.out.println("Which crypto you want to buy?");
                 Crypto.showCryptoInfo();
-                System.out.println("# : Dashboard");
+                System.out.println("# : dashboard");
                 System.out.print("Symbol: ");
                 Scanner inBuy = new Scanner(System.in);
                 String symbol = inBuy.next();
                 symbol = symbol.toUpperCase();
                 if(symbol=="#") {
-                    Dashboard(user);
+                    clearScreen();
+                    dashboard(user);
                 }
                 System.out.print("Amount: ");
                 Double holding = inBuy.nextDouble();
@@ -158,12 +156,13 @@ public class Main {
                 if(user.holdedCrypto.length>0) {
                     System.out.println("Which crypto you want to sell?");
                     user.showHoldedCryptos();
-                    System.out.println("# : Dashboard");
+                    System.out.println("# : dashboard");
                     System.out.print("Symbol: ");
-                    String symbol = inDashboard.next();
+                    String symbol = indashboard.next();
                     symbol = symbol.toUpperCase();
                     if(symbol=="#") {
-                        Dashboard(user);
+                        clearScreen();
+                        dashboard(user);
                     }
     
                     try {
@@ -185,6 +184,7 @@ public class Main {
                 System.out.print("Symbol: ");
                 String fromCrypto = inSwap.next();
                 fromCrypto = fromCrypto.toUpperCase();
+                clearScreen();
                 System.out.println("To which Crypto you want to swap?");
                 Crypto.showCryptoInfo();
                 System.out.print("Symbol: ");
@@ -202,14 +202,14 @@ public class Main {
                 user.showHoldedCryptos();
                 Scanner inHoldings = new Scanner(System.in);
                 System.out.println("Press:");
-                System.out.println("#: Dashboard");
+                System.out.println("#: dashboard");
                 System.out.println("Q: Quit");
                 char input1 = inHoldings.next().charAt(0);
-                clearScreen();
                 if(input1=='#') {
-                    Dashboard(user);
+                    clearScreen();
+                    dashboard(user);
                 } else if(Character.toUpperCase(input1)=='Q') {
-                    QuitProgram();
+                    quitProgram();
                 }
 
             } else if(input == 'T') {
@@ -217,24 +217,24 @@ public class Main {
                 user.showTransactionHistory();
                 Scanner inTransaction = new Scanner(System.in);
                 System.out.println("Press:");
-                System.out.println("#: Dashboard");
+                System.out.println("#: dashboard");
                 System.out.println("Q: Quit");
                 char input1 = inTransaction.next().charAt(0);
-                clearScreen();
                 if(input1=='#') {
-                    Dashboard(user);
+                    clearScreen();
+                    dashboard(user);
                 } else if(Character.toUpperCase(input1)=='Q') {
-                    QuitProgram();
+                    quitProgram();
                 }
 
             } else if(input == 'Q') {
-                QuitProgram();
+                quitProgram();
             }
         }
 
     }
 
-    public static User SignIn(String username, String pass, FetchUser[] users) throws Exception {
+    public static User signIn(String username, String pass, FetchUser[] users) throws Exception {
         for(int i = 0; i < users.length; i++){
             if(username.equals(users[i].username)){
                 String password = User.hashPassword(pass);
@@ -249,20 +249,20 @@ public class Main {
         throw new Exception("Login Failed");
     }
 
-    public static void SignOut(User ob){
-        ob.isLoggedIn = false;
-        System.out.println("Logged out of " + ob.username);
+    public static void signOut(User user){
+        user.isLoggedIn = false;
+        System.out.println("Logged out of " + user.username);
     }
 
     public static void returnToDashboard(User user) {
-        System.out.print("Returning to Dashboard ...");
+        System.out.print("Returning to dashboard ...");
         try {
             Thread.sleep(3000);
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
         clearScreen();
-        Dashboard(user);
+        dashboard(user);
     }
 
     public static void clearScreen() {  
@@ -270,7 +270,7 @@ public class Main {
         System.out.flush();  
     }
 
-    public static void QuitProgram() {
+    public static void quitProgram() {
         System.out.println("Thank You!");
         System.out.println("Terminating the Program.");
         try {
